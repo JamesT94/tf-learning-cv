@@ -42,12 +42,12 @@ train_datagen = ImageDataGenerator(rescale=1. / 255,
 test_datagen = ImageDataGenerator(rescale=1.0 / 255.0)
 
 train_generator = train_datagen.flow_from_directory(train_dir,
-                                                    batch_size=20,
+                                                    batch_size=10,
                                                     class_mode='binary',
                                                     target_size=(150, 150))
 
 validation_generator = test_datagen.flow_from_directory(train_dir,
-                                                        batch_size=20,
+                                                        batch_size=10,
                                                         class_mode='binary',
                                                         target_size=(150, 150))
 
@@ -76,10 +76,10 @@ model.compile(loss='binary_crossentropy',
 
 history = model.fit(
     train_generator,
-    steps_per_epoch=100,  # 2000 images = batch_size * steps
+    steps_per_epoch=200,  # 2000 images = batch_size * steps
     epochs=100,
     validation_data=validation_generator,
-    validation_steps=50,  # 1000 images = batch_size * steps
+    validation_steps=100,  # 1000 images = batch_size * steps
     verbose=2)
 
 tf.keras.models.save_model(model, 'Models/cat_dog_classifier_improved.hdf5')
