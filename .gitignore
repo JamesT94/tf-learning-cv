@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 cats_and_dogs.zip
 cats_and_dogs_filtered
+.idea
+*.hdf5
