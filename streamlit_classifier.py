@@ -1,7 +1,7 @@
 import streamlit as st
 import tensorflow as tf
 import numpy as np
-from PIL import Image, ImageOps
+from PIL import Image
 
 
 def image_to_array(image):
@@ -28,7 +28,14 @@ def load_model(name):
     return model
 
 
-model = load_model('Models/cat_dog_classifier.hdf5')
+st.write("""
+#CAT/DOG CLASSIFIER
+
+Upload a picture and see if it works!
+
+""")
+
+model = load_model('Models/cat_dog_classifier_improved.hdf5')
 
 file = st.file_uploader('Please upload your image', type=['jpg', 'png'])
 
@@ -43,40 +50,3 @@ else:
         st.write("It's a dog")
     else:
         st.write("It's a cat")
-
-#
-# st.write("""
-# #TEST TITLE
-#
-# Test smaller words
-#
-# """)
-#
-
-#
-# st.write(file)
-#
-#
-# def import_and_predict(image_data, model_data):
-#     img = ImageOps.fit(image_data, (150, 150), Image.ANTIALIAS)
-#     img = np.asarray(img)
-#     st.write(img)
-#
-#     img = np.expand_dims(img, axis=0)
-#     img = np.vstack([img])
-#
-#     result = model_data.predict(img)
-#
-#     return result
-#
-#
-# if file is None:
-#     st.text('Please upload an image file')
-# else:
-#     image = Image.open(file)
-#     st.image(image, use_column_width=True)
-#     prediction = import_and_predict(image, model)
-#     if prediction > 0:
-#         st.write("It's a dog")
-#     else:
-#         st.write("It's a cat")
