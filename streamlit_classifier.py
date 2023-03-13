@@ -22,30 +22,24 @@ def predict_image(image, model):
     return result
 
 
-@st.cache(allow_output_mutation=True)
-def load_model(name):
-    model = tf.keras.models.load_model(name)
-    return model
-
-
 st.write("""
-#CAT/DOG CLASSIFIER
+# CAT/DOG CLASSIFIER
 
-Upload a picture and see if it works!
+Upload a picture of a cat or a dog!
 
 """)
 
-model = load_model('Models/cat_dog_classifier_improved.hdf5')
+selected_model = tf.keras.models.load_model('Models/cat_dog_classifier_13032023_195241.hdf5')
 
 file = st.file_uploader('Please upload your image', type=['jpg', 'png'])
 
 if file is None:
     st.text('Please upload an image file')
 else:
-    image = Image.open(file)
-    image_array = image_to_array(image)
+    uploaded_image = Image.open(file)
+    image_array = image_to_array(uploaded_image)
     st.image(image_array, use_column_width=True)
-    prediction = predict_image(image, model)
+    prediction = predict_image(uploaded_image, selected_model)
     if prediction > 0:
         st.write("It's a dog")
     else:

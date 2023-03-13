@@ -5,8 +5,9 @@ The output file is a model in hdf5 format
 """
 
 import os
-import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
+from datetime import datetime
 
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -14,6 +15,8 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 ###############################
 # ------ DATA HANDLING ------ #
 ###############################
+
+BATCH_SIZE = 10
 
 base_dir = 'Data/cats_and_dogs_filtered'
 train_dir = os.path.join(base_dir, 'train')
@@ -29,8 +32,13 @@ validation_dogs_dir = os.path.join(validation_dir, 'dogs')
 
 train_cats_fnames = os.listdir(train_cats_dir)
 train_dogs_fnames = os.listdir(train_dogs_dir)
+val_cats_fnames = os.listdir(validation_cats_dir)
+val_dogs_fnames = os.listdir(validation_dogs_dir)
 
-train_datagen = ImageDataGenerator(rescale=1. / 255,
+num_train_images = len(train_cats_fnames) + len(train_dogs_fnames)
+num_val_images = len(train_cats_fnames) + len(train_dogs_fnames)
+
+train_datagen = ImageDataGenerator(rescale=1.0 / 255,
                                    rotation_range=40,
                                    width_shift_range=0.2,
                                    height_shift_range=0.2,
@@ -42,12 +50,12 @@ train_datagen = ImageDataGenerator(rescale=1. / 255,
 test_datagen = ImageDataGenerator(rescale=1.0 / 255.0)
 
 train_generator = train_datagen.flow_from_directory(train_dir,
-                                                    batch_size=10,
+                                                    batch_size=BATCH_SIZE,
                                                     class_mode='binary',
                                                     target_size=(150, 150))
 
 validation_generator = test_datagen.flow_from_directory(train_dir,
-                                                        batch_size=10,
+                                                        batch_size=BATCH_SIZE,
                                                         class_mode='binary',
                                                         target_size=(150, 150))
 
@@ -76,31 +84,30 @@ model.compile(loss='binary_crossentropy',
 
 history = model.fit(
     train_generator,
-    steps_per_epoch=200,  # 2000 images = batch_size * steps
+    steps_per_epoch=num_train_images / BATCH_SIZE,  # 2000 images = batch_size * steps
     epochs=100,
     validation_data=validation_generator,
-    validation_steps=100,  # 1000 images = batch_size * steps
+    validation_steps=num_val_images / BATCH_SIZE,  # 1000 images = batch_size * steps
     verbose=2)
 
-tf.keras.models.save_model(model, 'Models/cat_dog_classifier_improved.hdf5')
-
-import matplotlib.pyplot as plt
+dt_string = datetime.now().strftime("%d%m%Y_%H%M%S")
+tf.keras.models.save_model(model, f'Models/cat_dog_classifier_{dt_string}.hdf5')
 
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
-epochs = range(len(acc))
+num_epochs = range(len(acc))
 
-plt.plot(epochs, acc, 'bo', label='Training accuracy')
-plt.plot(epochs, val_acc, 'b', label='Validation accuracy')
+plt.plot(num_epochs, acc, 'bo', label='Training accuracy')
+plt.plot(num_epochs, val_acc, 'b', label='Validation accuracy')
 plt.title('Training and validation accuracy')
 
 plt.figure()
 
-plt.plot(epochs, loss, 'bo', label='Training Loss')
-plt.plot(epochs, val_loss, 'b', label='Validation Loss')
+plt.plot(num_epochs, loss, 'bo', label='Training Loss')
+plt.plot(num_epochs, val_loss, 'b', label='Validation Loss')
 plt.title('Training and validation loss')
 plt.legend()
 
